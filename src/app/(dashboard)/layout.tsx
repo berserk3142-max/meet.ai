@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { CommandProvider } from "@/components/dashboard/CommandProvider";
+import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 
 export default async function DashboardLayout({
     children,
@@ -29,11 +30,13 @@ export default async function DashboardLayout({
         <CommandProvider>
             <div className="flex h-screen bg-zinc-950">
                 <Sidebar />
-                <main className="flex-1 overflow-auto">
-                    {children}
-                </main>
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <DashboardNavbar user={session.user} />
+                    <main className="flex-1 overflow-auto">
+                        {children}
+                    </main>
+                </div>
             </div>
         </CommandProvider>
     );
 }
-
