@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../init";
-import { agentsService, createAgentSchema, updateAgentSchema } from "@/modules/agents";
+import { agentsService, createAgentSchema, updateAgentSchema, agentsFilterSchema } from "@/modules/agents";
 import { TRPCError } from "@trpc/server";
 
 export const agentsRouter = router({
@@ -11,6 +11,22 @@ export const agentsRouter = router({
         const agents = await agentsService.getAllByUserId(ctx.user.id);
         return agents;
     }),
+
+    /**
+     * Get agents with pagination and search
+     */
+    getMany: protectedProcedure
+        .input(agentsFilterSchema)
+        .query(async ({ ctx, input }) => {
+            const result = await agentsService.getMany({
+                userId: ctx.user.id,
+                search: input.search,
+                page: input.page,
+                pageSize: input.pageSize,
+                status: input.status,
+            });
+            return result;
+        }),
 
     /**
      * Get a single agent by ID

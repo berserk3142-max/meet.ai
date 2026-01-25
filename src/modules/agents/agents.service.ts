@@ -1,8 +1,24 @@
 import { db } from "@/db";
 import { agent } from "@/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, ilike, desc, sql, count } from "drizzle-orm";
 import type { CreateAgentInput, UpdateAgentInput } from "./agents.types";
 import { nanoid } from "nanoid";
+
+export interface GetManyParams {
+    userId: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+    status?: string;
+}
+
+export interface GetManyResult {
+    agents: (typeof agent.$inferSelect)[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
 
 /**
  * Agents Service - Database operations for agents
@@ -16,7 +32,54 @@ export const agentsService = {
             .select()
             .from(agent)
             .where(eq(agent.userId, userId))
-            .orderBy(agent.createdAt);
+            .orderBy(desc(agent.createdAt));
+    },
+
+    /**
+     * Get agents with pagination and search
+     */
+    async getMany(params: GetManyParams): Promise<GetManyResult> {
+        const { userId, search, page = 1, pageSize = 10, status } = params;
+        const offset = (page - 1) * pageSize;
+
+        // Build where conditions
+        const conditions = [eq(agent.userId, userId)];
+
+        if (search && search.trim()) {
+            conditions.push(ilike(agent.name, `%${search.trim()}%`));
+        }
+
+        if (status && status !== "all") {
+            conditions.push(eq(agent.status, status));
+        }
+
+        const whereClause = and(...conditions);
+
+        // Get agents with pagination
+        const agents = await db
+            .select()
+            .from(agent)
+            .where(whereClause)
+            .orderBy(desc(agent.createdAt))
+            .limit(pageSize)
+            .offset(offset);
+
+        // Get total count
+        const [countResult] = await db
+            .select({ total: count() })
+            .from(agent)
+            .where(whereClause);
+
+        const total = countResult?.total || 0;
+        const totalPages = Math.ceil(total / pageSize);
+
+        return {
+            agents,
+            total,
+            page,
+            pageSize,
+            totalPages,
+        };
     },
 
     /**

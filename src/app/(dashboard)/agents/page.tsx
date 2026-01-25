@@ -11,6 +11,7 @@ import { AgentDialog } from "@/components/agents/AgentDialog";
 import { AgentsEmptyState } from "@/components/ui/empty-state";
 import { Bot, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import type { Agent, CreateAgentInput, UpdateAgentInput } from "@/modules/agents";
 
 function AgentsPageContent() {
@@ -103,7 +104,7 @@ function AgentsPageContent() {
     // Status badge
     const StatusBadge = ({ status }: { status: string }) => {
         const styles = {
-            active: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+            active: "bg-green-500/20 text-green-400 border-green-500/30",
             inactive: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
             archived: "bg-zinc-500/20 text-zinc-400 border-zinc-500/30",
         };
@@ -159,8 +160,8 @@ function AgentsPageContent() {
                                             <tr key={agent.id} className="border-b border-zinc-800 last:border-0 hover:bg-zinc-800/50 transition-colors">
                                                 <td className="px-4 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-600/20 to-teal-600/20 rounded-lg flex items-center justify-center border border-emerald-500/30">
-                                                            <Bot className="w-5 h-5 text-emerald-400" />
+                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg flex items-center justify-center border border-blue-500/30">
+                                                            <Bot className="w-5 h-5 text-blue-400" />
                                                         </div>
                                                         <div>
                                                             <div className="font-medium text-white">{agent.name}</div>
